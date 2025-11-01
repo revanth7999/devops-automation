@@ -1,12 +1,21 @@
 ---
+- name: Remove conflicting curl-minimal
+  dnf:
+    name: curl-minimal
+    state: absent
+
 - name: Install required packages
-  yum:
-    name: "{{ item }}"
+  dnf:
+    name:
+      - git
+      - curl
+      - docker
     state: present
-  loop:
-    - git
-    - curl
-    - docker
+
+- name: Install python3-pip
+  dnf:
+    name: python3-pip
+    state: present
 
 - name: Start and enable Docker
   service:
@@ -20,10 +29,10 @@
     group: docker
     append: yes
 
-- name: Pull MySQL Docker image
-  docker_image:
-    name: devrevdocker/mysql-image:latest
+# - name: Pull MySQL Docker image
+#   docker_image:
+#     name: devrevdocker/mysql-image:latest
 
-- name: Pull Backend App Docker image
-  docker_image:
-    name: devrevdocker/mybackend-app:latest
+# - name: Pull Backend App Docker image
+#   docker_image:
+#     name: devrevdocker/mybackend-app:latest
