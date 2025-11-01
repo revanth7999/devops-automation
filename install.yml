@@ -1,0 +1,29 @@
+---
+- name: Install required packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - git
+    - curl
+    - docker
+
+- name: Start and enable Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add ec2-user to docker group
+  user:
+    name: ec2-user
+    group: docker
+    append: yes
+
+- name: Pull MySQL Docker image
+  docker_image:
+    name: devrevdocker/mysql-image:latest
+
+- name: Pull Backend App Docker image
+  docker_image:
+    name: devrevdocker/mybackend-app:latest

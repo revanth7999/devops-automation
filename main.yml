@@ -1,0 +1,28 @@
+---
+- name: Run Terraform to create EC2 and generate inventory
+  hosts: localhost
+  tasks:
+    - name: Run terraform apply
+      command: terraform apply -auto-approve
+      args:
+        chdir: /home/revanth/aws-free-tier-ec2
+
+    - name: Get EC2 public IP from terraform output
+      command: terraform output -raw instance_public_ip
+      args:
+        chdir: /home/revanth/aws-free-tier-ec2
+      register: ec2_ip
+
+    - name: Generate inventory file
+      template:
+        src: inventory.tmpl
+        dest: ./inventory
+      vars:
+        ip: "{{ ec2_ip.stdout }}"
+
+- name: Install software + docker on EC2
+  hosts: ec2
+  remote_user: ec2-user
+  become: yes
+  tasks:
+    - import_tasks: install.yml
